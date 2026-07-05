@@ -18,7 +18,7 @@ import Dashboard from "./dashbordPage";
 import Packages from "./Packeges/home";
 import Payment from "./Payment";
 import Booking from "./booking";
-import ViewBooking from "./ViewBooking";
+import ViewBooking from "./viewBooking";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -163,14 +163,14 @@ export default function HomePage() {
               <Route
                 path="/bookings"
                 element={
-                  <ViewBooking  />
+                  <ViewBooking/>
                 }
               />
 
               <Route
                 path="/addBooking"
                 element={
-                  <Booking  />
+                  <Booking/>
                 }
               />
 
