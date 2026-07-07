@@ -28,7 +28,11 @@ export default function Payment() {
       ]);
 
       setPayments(payRes.data.data);
-      setBookings(bookRes.data.data);
+      const pendingBookings = bookRes.data.data.filter(
+  (b)=> b.balance > 0
+);
+
+setBookings(pendingBookings);
     } catch (err) {
       console.log(err);
     } finally {
@@ -133,8 +137,9 @@ export default function Payment() {
             <option value="">Select Booking</option>
             {bookings.map((b) => (
               <option key={b._id} value={b._id}>
-                {b.customerName} - Rs.{b.totalAmount}
-              </option>
+  {b.customerName} | 
+  Rs.{b.balance} Balance
+</option>
             ))}
           </select>
 
@@ -178,61 +183,298 @@ export default function Payment() {
         </form>
       </div>
 
-      {/* LIST */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {/* PAYMENT TABLE */}
 
-        {payments.map((p) => (
-          <div
-            key={p._id}
-            className="bg-white/5 border border-white/10 p-5 rounded-2xl hover:scale-[1.02] transition"
+<div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+
+  <div className="p-5 border-b border-white/10">
+    <h2 className="text-lg font-semibold text-white">
+      Payment History
+    </h2>
+
+    <p className="text-sm text-gray-400">
+      Total Payments: {payments.length}
+    </p>
+  </div>
+
+
+  <div className="overflow-x-auto">
+
+    <table className="w-full text-left text-white">
+
+      <thead className="bg-white/10 text-gray-300 text-sm uppercase">
+
+        <tr>
+
+          <th className="px-6 py-4">
+            #
+          </th>
+
+          <th className="px-6 py-4">
+            Customer
+          </th>
+
+          <th className="px-6 py-4">
+            Packages
+          </th>
+
+          <th className="px-6 py-4">
+            Total
+          </th>
+
+          <th className="px-6 py-4">
+            Paid
+          </th>
+
+          <th className="px-6 py-4">
+            Balance
+          </th>
+
+          <th className="px-6 py-4">
+            Method
+          </th>
+
+          <th className="px-6 py-4 text-center">
+            Actions
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+
+      <tbody>
+
+
+      {
+        payments.length === 0 ? (
+
+          <tr>
+
+            <td
+              colSpan="8"
+              className="text-center py-8 text-gray-400"
+            >
+              No Payments Found
+            </td>
+
+          </tr>
+
+
+        ) : (
+
+
+        payments.map((p,index)=>(
+
+
+          <tr
+
+          key={p._id}
+
+          className="border-t border-white/10 hover:bg-white/5 transition"
+
           >
 
-            <h3 className="font-bold text-lg text-white">
-              {p.booking?.customerName}
-            </h3>
 
-            <p className="text-gray-400 text-sm">
-              Package: {p.booking?.package?.packageName}
-            </p>
+            <td className="px-6 py-4">
+              {index+1}
+            </td>
 
-            <p className="mt-2 text-green-400 font-bold">
-              Rs. {p.amount}
-            </p>
 
-            <p className="text-sm text-gray-400">
-              Method: {p.paymentMethod}
-            </p>
 
-            {/* ACTIONS */}
-            <div className="flex gap-2 mt-4">
+            <td className="px-6 py-4">
 
-              {/* INVOICE */}
-              <button
-                onClick={() => downloadInvoice(p._id)}
-                className="flex items-center gap-2 px-3 py-2 bg-blue-600/20 text-blue-400 rounded-lg"
-              >
-                <FiFileText /> Invoice
-              </button>
+              <p className="font-semibold">
+                {p.booking?.customerName}
+              </p>
 
-              {/* DELETE */}
-              <button
-                onClick={() => handleDelete(p._id)}
-                disabled={deletingId === p._id}
-                className="flex items-center gap-2 px-3 py-2 bg-red-500/20 text-red-400 rounded-lg disabled:opacity-50"
-              >
-                {deletingId === p._id ? "Deleting..." : (
-                  <>
-                    <FiTrash2 /> Delete
-                  </>
-                )}
-              </button>
+              <p className="text-xs text-gray-400">
+                {p.booking?.phone}
+              </p>
+
+            </td>
+
+
+
+
+
+            <td className="px-6 py-4 max-w-xs">
+
+
+            <div className="flex flex-wrap gap-1">
+
+
+            {
+              p.booking?.packages?.map((pkg)=>(
+
+                <span
+
+                key={pkg._id}
+
+                className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs"
+
+                >
+
+                  {pkg.packageName}
+
+                </span>
+
+
+              ))
+            }
+
 
             </div>
 
-          </div>
-        ))}
 
-      </div>
+            </td>
+
+
+
+
+
+
+            <td className="px-6 py-4">
+
+              Rs. {p.booking?.totalAmount}
+
+            </td>
+
+
+
+
+
+            <td className="px-6 py-4">
+
+              <span className="text-green-400 font-semibold">
+
+                Rs. {p.amount}
+
+              </span>
+
+            </td>
+
+
+
+
+
+            <td className="px-6 py-4">
+
+              {
+                p.booking?.balance === 0 ? (
+
+                  <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs">
+                    Paid
+                  </span>
+
+
+                ) : (
+
+                  <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs">
+                    Rs. {p.booking?.balance}
+                  </span>
+
+                )
+              }
+
+
+            </td>
+
+
+
+
+
+            <td className="px-6 py-4">
+
+              <span className="bg-white/10 px-3 py-1 rounded-full text-xs">
+
+                {p.paymentMethod}
+
+              </span>
+
+            </td>
+
+
+
+
+
+            <td className="px-6 py-4">
+
+
+              <div className="flex justify-center gap-2">
+
+
+                {/* Invoice */}
+
+                <button
+
+                onClick={() => downloadInvoice(p._id)}
+
+                className="flex items-center gap-2 px-3 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30"
+
+                >
+
+                  <FiFileText/>
+
+                </button>
+
+
+
+
+
+                {/* Delete */}
+
+                <button
+
+                onClick={()=>handleDelete(p._id)}
+
+                disabled={deletingId === p._id}
+
+                className="flex items-center gap-2 px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 disabled:opacity-50"
+
+                >
+
+                {
+                  deletingId === p._id
+                  ?
+                  "..."
+                  :
+                  <FiTrash2/>
+                }
+
+
+                </button>
+
+
+              </div>
+
+
+            </td>
+
+
+          </tr>
+
+
+        ))
+
+
+        )
+
+      }
+
+
+
+      </tbody>
+
+
+    </table>
+
+
+  </div>
+
+
+</div>
 
     </div>
   );

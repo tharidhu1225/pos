@@ -89,8 +89,8 @@ export default function HomePage() {
 
         {/* USER CARD */}
         <div className="mb-8 p-5 rounded-2xl bg-white/5 border border-white/10 text-center">
-          <div className="w-14 h-14 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-xl">
-            {user?.name?.charAt(0) || "A"}
+          <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-black-500 to-black-600 flex items-center justify-center font-bold text-xl">
+            <img src="/logo.png" alt="User Avatar" className="w-16 h-16" />
           </div>
 
           <h2 className="mt-3 font-semibold">

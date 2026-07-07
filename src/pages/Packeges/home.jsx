@@ -166,63 +166,93 @@ export default function Packages() {
       </div>
 
       {/* LIST */}
-      {loading ? (
-        <div className="text-gray-400">Loading packages...</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {/* LIST */}
+{loading ? (
+  <div className="text-gray-400">Loading packages...</div>
+) : (
+  <div className="overflow-x-auto bg-white/5 border border-white/10 rounded-2xl">
+    <table className="w-full text-left text-white">
+      <thead className="bg-white/10 text-gray-300 uppercase text-sm">
+        <tr>
+          <th className="px-6 py-4">#</th>
+          <th className="px-6 py-4">Package Name</th>
+          <th className="px-6 py-4">Description</th>
+          <th className="px-6 py-4">Price</th>
+          <th className="px-6 py-4 text-center">Actions</th>
+        </tr>
+      </thead>
 
-          {packages.map((pkg) => (
-            <div
-              key={pkg._id}
-              className="bg-white/5 border border-white/10 p-5 rounded-2xl hover:scale-[1.02] transition"
+      <tbody>
+        {packages.length === 0 ? (
+          <tr>
+            <td
+              colSpan="5"
+              className="text-center py-8 text-gray-400"
             >
-              <h3 className="text-xl font-bold text-white">
+              No Packages Found
+            </td>
+          </tr>
+        ) : (
+          packages.map((pkg, index) => (
+            <tr
+              key={pkg._id}
+              className="border-t border-white/10 hover:bg-white/5 transition"
+            >
+              <td className="px-6 py-4">{index + 1}</td>
+
+              <td className="px-6 py-4 font-semibold">
                 {pkg.packageName}
-              </h3>
+              </td>
 
-              <p className="text-gray-400 text-sm mt-1">
+              <td className="px-6 py-4 text-gray-400 max-w-sm">
                 {pkg.description || "No description"}
-              </p>
+              </td>
 
-              <h2 className="text-2xl font-bold text-green-400 mt-3">
-                Rs. {pkg.price}
-              </h2>
+              <td className="px-6 py-4">
+                <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full font-semibold">
+                  Rs. {pkg.price}
+                </span>
+              </td>
 
-              <div className="flex gap-3 mt-5">
+              <td className="px-6 py-4">
+                <div className="flex justify-center gap-3">
+                  {/* Edit */}
+                  <button
+                    onClick={() => handleEdit(pkg)}
+                    disabled={deletingId}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition"
+                  >
+                    <FiEdit />
+                    Edit
+                  </button>
 
-                {/* EDIT */}
-                <button
-                  onClick={() => handleEdit(pkg)}
-                  disabled={deletingId}
-                  className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 text-yellow-400 rounded-lg disabled:opacity-50"
-                >
-                  <FiEdit /> Edit
-                </button>
-
-                {/* DELETE */}
-                <button
-                  onClick={() => handleDelete(pkg._id)}
-                  disabled={deletingId === pkg._id}
-                  className="flex items-center gap-2 px-3 py-2 bg-red-500/20 text-red-400 rounded-lg disabled:opacity-50"
-                >
-                  {deletingId === pkg._id ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
-                      Deleting...
-                    </>
-                  ) : (
-                    <>
-                      <FiTrash2 /> Delete
-                    </>
-                  )}
-                </button>
-
-              </div>
-            </div>
-          ))}
-
-        </div>
-      )}
+                  {/* Delete */}
+                  <button
+                    onClick={() => handleDelete(pkg._id)}
+                    disabled={deletingId === pkg._id}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
+                  >
+                    {deletingId === pkg._id ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <FiTrash2 />
+                        Delete
+                      </>
+                    )}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+)}
 
     </div>
   );
