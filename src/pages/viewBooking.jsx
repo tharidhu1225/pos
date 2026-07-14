@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FiSearch, FiEye, FiTrash2, FiPlus } from "react-icons/fi";
+import { FiSearch, FiEye, FiTrash2, FiPlus, FiEdit } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 export default function ViewBooking() {
@@ -142,17 +142,29 @@ export default function ViewBooking() {
                   </td>
 
                   <td className="flex gap-2 p-3">
-                    <button className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:scale-110 transition">
-                      <FiEye />
-                    </button>
 
-                    <button
-                      onClick={() => handleDelete(b._id)}
-                      className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:scale-110 transition"
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </td>
+  {/* View */}
+  <button className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:scale-110 transition">
+    <FiEye />
+  </button>
+
+  {/* Edit */}
+  <button
+    onClick={() => navigate(`/updateBooking/${b._id}`)}
+    className="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:scale-110 transition"
+  >
+    <FiEdit />
+  </button>
+
+  {/* Delete */}
+  <button
+    onClick={() => handleDelete(b._id)}
+    className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:scale-110 transition"
+  >
+    <FiTrash2 />
+  </button>
+
+</td>
                 </tr>
               ))}
             </tbody>
