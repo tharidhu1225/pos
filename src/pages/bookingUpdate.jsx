@@ -11,6 +11,13 @@ export default function BookingUpdate() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [paymentInfo, setPaymentInfo] = useState({
+  totalAmount: 0,
+  paidAmount: 0,
+  balance: 0,
+  paymentStatus: "Pending",
+});
+
   const [formData, setFormData] = useState({
     customerName: "",
     phone: "",
@@ -19,7 +26,6 @@ export default function BookingUpdate() {
     packages: [],
     extraCharges: 0,
     discount: 0,
-    advancePayment: 0,
     bookingStatus: "Booked",
     paymentStatus: "Pending",
     notes: "",
@@ -48,11 +54,17 @@ export default function BookingUpdate() {
       packages: booking.packages.map((p) => p._id),
       extraCharges: booking.extraCharges,
       discount: booking.discount,
-      advancePayment: booking.advancePayment,
       bookingStatus: booking.bookingStatus,
-      paymentStatus: booking.paymentStatus,
       notes: booking.notes,
     });
+
+    setPaymentInfo({
+      totalAmount: booking.totalAmount,
+      paidAmount: booking.paidAmount,
+      balance: booking.balance,
+      paymentStatus: booking.paymentStatus,
+    });
+
   } catch (err) {
     console.log(err);
     toast.error("Failed to load booking");
@@ -82,14 +94,14 @@ export default function BookingUpdate() {
     });
   };
 
-  const handlePackageChange = (e) => {
-    const values = [...e.target.selectedOptions].map((option) => option.value);
-
-    setFormData({
-      ...formData,
-      packages: values,
-    });
-  };
+  const togglePackage = (id) => {
+  setFormData((prev) => ({
+    ...prev,
+    packages: prev.packages.includes(id)
+      ? prev.packages.filter((pkg) => pkg !== id)
+      : [...prev.packages, id],
+  }));
+};
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -113,6 +125,14 @@ navigate("/bookings");
     setSaving(false);
   }
 };
+const packageTotal = packages
+  .filter((pkg) => formData.packages.includes(pkg._id))
+  .reduce((sum, pkg) => sum + pkg.price, 0);
+
+const finalTotal =
+  packageTotal +
+  Number(formData.extraCharges) -
+  Number(formData.discount);
 
 if (loading) {
   return (
@@ -218,23 +238,80 @@ if (loading) {
     Packages
   </label>
 
-  <select
-    multiple
-    value={formData.packages}
-    onChange={handlePackageChange}
-    className="w-full h-40 bg-white/5 border border-white/10 rounded-xl p-3 text-white"
-  >
-    {packages.map((item) => (
-      <option
-        key={item._id}
-        value={item._id}
-        className="bg-slate-900"
-      >
-        {item.packageName} - Rs. {item.price}
-      </option>
-    ))}
-  </select>
+  <div>
+  <div className="flex justify-between items-center mb-3">
+    <label className="text-gray-300 font-medium">
+      Select Packages
+    </label>
+
+    <span className="text-xs text-blue-400">
+      {formData.packages.length} package(s) selected
+    </span>
+  </div>
+
+  <div className="grid md:grid-cols-2 gap-3 max-h-72 overflow-y-auto border border-white/10 rounded-xl p-4 bg-white/5">
+
+    {packages.map((pkg) => {
+      const selected = formData.packages.includes(pkg._id);
+
+      return (
+        <div
+          key={pkg._id}
+          onClick={() => togglePackage(pkg._id)}
+          className={`cursor-pointer rounded-xl border p-4 transition-all
+          ${
+            selected
+              ? "border-blue-500 bg-blue-500/20"
+              : "border-white/10 hover:border-blue-400 hover:bg-white/5"
+          }`}
+        >
+          <div className="flex justify-between items-start">
+
+            <div>
+              <h3 className="text-white font-semibold">
+                {pkg.packageName}
+              </h3>
+
+              <p className="text-green-400 text-sm">
+                Rs. {pkg.price}
+              </p>
+            </div>
+
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={() => togglePackage(pkg._id)}
+              className="w-5 h-5 accent-blue-500"
+            />
+            
+          </div>
+          
+        </div>
+      );
+    })}
+  </div>
 </div>
+</div>
+{formData.packages.length > 0 && (
+  <div className="mt-4">
+    <p className="text-gray-400 mb-2">
+      Selected Packages
+    </p>
+
+    <div className="flex flex-wrap gap-2">
+      {packages
+        .filter((pkg) => formData.packages.includes(pkg._id))
+        .map((pkg) => (
+          <span
+            key={pkg._id}
+            className="bg-blue-500/20 text-blue-300 px-3 py-2 rounded-full text-sm"
+          >
+            {pkg.packageName}
+          </span>
+        ))}
+    </div>
+  </div>
+)}
 <div className="grid md:grid-cols-3 gap-6">
 
   <div>
@@ -265,20 +342,6 @@ if (loading) {
     />
   </div>
 
-  <div>
-    <label className="block text-gray-300 mb-2">
-      Advance Payment
-    </label>
-
-    <input
-      type="number"
-      name="advancePayment"
-      value={formData.advancePayment}
-      onChange={handleChange}
-      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white"
-    />
-  </div>
-
 </div>
 <div className="grid md:grid-cols-2 gap-6">
 
@@ -301,20 +364,73 @@ if (loading) {
   </div>
 
   <div>
-    <label className="block text-gray-300 mb-2">
-      Payment Status
-    </label>
+  <label className="block text-gray-300 mb-2">
+    Payment Status
+  </label>
 
-    <select
-      name="paymentStatus"
-      value={formData.paymentStatus}
-      onChange={handleChange}
-      className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white"
-    >
-      <option className="bg-slate-900">Pending</option>
-      <option className="bg-slate-900">Partially Paid</option>
-      <option className="bg-slate-900">Paid</option>
-    </select>
+  <span
+    className={`inline-block px-4 py-2 rounded-xl font-medium
+    ${
+      paymentInfo.paymentStatus === "Paid"
+        ? "bg-green-500/20 text-green-400"
+        : paymentInfo.paymentStatus === "Partially Paid"
+        ? "bg-yellow-500/20 text-yellow-400"
+        : "bg-red-500/20 text-red-400"
+    }`}
+  >
+    {paymentInfo.paymentStatus}
+  </span>
+</div>
+
+</div>
+<div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl border border-white/10 p-6">
+
+  <h2 className="text-xl font-semibold text-white mb-5">
+    Payment Summary
+  </h2>
+
+  <div className="grid md:grid-cols-4 gap-5">
+
+    <div className="bg-white/5 rounded-xl p-4">
+      <p className="text-gray-400 text-sm">
+        Package Total
+      </p>
+
+      <h3 className="text-2xl font-bold text-green-400 mt-2">
+        Rs. {packageTotal}
+      </h3>
+    </div>
+
+    <div className="bg-white/5 rounded-xl p-4">
+      <p className="text-gray-400 text-sm">
+        Booking Total
+      </p>
+
+      <h3 className="text-2xl font-bold text-blue-400 mt-2">
+        Rs. {finalTotal}
+      </h3>
+    </div>
+
+    <div className="bg-white/5 rounded-xl p-4">
+      <p className="text-gray-400 text-sm">
+        Paid Amount
+      </p>
+
+      <h3 className="text-2xl font-bold text-green-500 mt-2">
+        Rs. {paymentInfo.paidAmount}
+      </h3>
+    </div>
+
+    <div className="bg-white/5 rounded-xl p-4">
+      <p className="text-gray-400 text-sm">
+        Remaining Balance
+      </p>
+
+      <h3 className="text-2xl font-bold text-yellow-400 mt-2">
+        Rs. {Math.max(finalTotal - paymentInfo.paidAmount, 0)}
+      </h3>
+    </div>
+
   </div>
 
 </div>

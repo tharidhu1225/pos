@@ -113,7 +113,18 @@ export default function ViewBooking() {
                   </td>
 
                   <td>{b.phone}</td>
-                  <td>{b.package?.packageName}</td>
+                  <td>
+  <div className="flex flex-wrap gap-1">
+    {b.packages?.map((pkg) => (
+      <span
+        key={pkg._id}
+        className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs"
+      >
+        {pkg.packageName}
+      </span>
+    ))}
+  </div>
+</td>
 
                   <td>
                     {new Date(b.eventDate).toLocaleDateString()}

@@ -20,6 +20,7 @@ import Payment from "./Payment";
 import Booking from "./booking";
 import ViewBooking from "./viewBooking";
 import BookingUpdate from "./bookingUpdate";
+import PaymentEdit from "./updatePayment";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -184,6 +185,11 @@ export default function HomePage() {
                 }
               />
               <Route path="/updateBooking/:id" element={<BookingUpdate />} />
+
+              <Route 
+path="/payment/edit/:id"
+element={<PaymentEdit/>}
+/>
 
             </Routes>
 

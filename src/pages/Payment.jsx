@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FiTrash2, FiPlus, FiFileText } from "react-icons/fi";
+import { FiTrash2, FiPlus, FiFileText, FiEdit } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 export default function Payment() {
+  const navigate = useNavigate();
   const [payments, setPayments] = useState([]);
   const [bookings, setBookings] = useState([]);
 
@@ -101,6 +103,8 @@ setBookings(pendingBookings);
       </div>
     );
   }
+
+  
 
   return (
     <div className="space-y-8 p-4">
@@ -420,7 +424,12 @@ setBookings(pendingBookings);
                 </button>
 
 
-
+<button
+    onClick={() => navigate(`/payment/edit/${p._id}`)}
+    className="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:scale-110 transition"
+>
+  <FiEdit />
+</button>
 
 
                 {/* Delete */}
